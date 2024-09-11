@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import "./globals.css";
-import {
-  ClerkProvider
-} from '@clerk/nextjs'
 import {IBM_Plex_Sans} from "next/font/google";
-import { cn } from "@/lib/utils";
+import "./globals.css";
 
-const IBMPlex=IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-ibm-plex'
+const geistSans = localFont({
+  src: "./fonts/GeistVF.woff",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+});
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  weight: "100 900",
 });
 
 
