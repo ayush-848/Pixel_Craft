@@ -16,6 +16,8 @@
     "clerk": "^0.8.3",
     "clsx": "^2.1.1",
     "lucide-react": "^0.439.0",
+    "mongodb": "^6.8.1",
+    "mongoose": "^8.6.1",
     "next": "14.2.9",
     "react": "^18",
     "react-dom": "^18",
