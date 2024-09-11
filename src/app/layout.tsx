@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
+import "./globals.css";
 import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton
+  ClerkProvider
 } from '@clerk/nextjs'
 import {IBM_Plex_Sans} from "next/font/google";
-import "./globals.css";
 import { cn } from "@/lib/utils";
 
 const IBMPlex=IBM_Plex_Sans({
