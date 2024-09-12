@@ -10,6 +10,7 @@ interface MongooseConnection {
 
 // Extend the global object to include a mongoose property
 declare global {
+  // Allow global `mongoose` object to be used and cached across re-renders
   var mongoose: MongooseConnection | undefined;
 }
 
@@ -22,18 +23,30 @@ if (!cached) {
 }
 
 export const connectToDatabase = async (): Promise<Mongoose> => {
-  if (cached.conn) return cached.conn;
+  if (cached.conn) {
+    console.log('Using existing Mongoose connection');
+    return cached.conn;
+  }
 
-  if (!MONGODB_URL) throw new Error('Missing MONGODB_URL');
+  if (!MONGODB_URL) {
+    throw new Error('Missing MONGODB_URL');
+  }
 
   // If there is no existing connection promise, create one
-  cached.promise = cached.promise || mongoose.connect(MONGODB_URL, { 
-    dbName: 'Pixel Craft', 
-    bufferCommands: false 
-  });
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URL, {
+      dbName: 'pixel_craft', // Replace with your DB name
+      bufferCommands: false,
+    });
+  }
 
-  // Wait for the promise to resolve and store the connection
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+    throw new Error('MongoDB connection failed');
+  }
 
   return cached.conn;
 };

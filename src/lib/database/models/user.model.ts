@@ -36,6 +36,11 @@ const UserSchema = new Schema({
   },
 });
 
+// Adding indexes to ensure unique constraints
+UserSchema.index({ clerkId: 1 }, { unique: true });
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ username: 1 }, { unique: true });
+
 const User = models?.User || model("User", UserSchema);
 
 export default User;
