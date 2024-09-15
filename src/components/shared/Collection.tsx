@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,13 +12,14 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { transformationTypes } from "@/constants";
-import { IImage } from "@/lib/database/models/image.model";
 import { formUrlQuery } from "@/lib/utils";
 
 import { Button } from "../ui/button";
 import { Search } from "./Search";
+import { IImage } from "@/lib/database/models/image.model";
 
-const fetchUserImages = async (page: number) => {
+
+const fetchUserImages = async (page: number): Promise<{ images: IImage[], totalPages: number }> => {
   console.log(`Fetching images for page ${page}`);
   const response = await fetch(`/api/images?page=${page}`);
   if (!response.ok) {
@@ -34,7 +33,7 @@ const fetchUserImages = async (page: number) => {
 
 export const Collection = ({
   hasSearch = false,
-  initialImages = [],  // Update to use initialImages
+  initialImages = [],
   totalPages: initialTotalPages = 1,
   page: initialPage = 1,
 }: {
@@ -47,7 +46,7 @@ export const Collection = ({
   const searchParams = useSearchParams();
   const { isLoaded: isUserLoaded, isSignedIn } = useUser();
 
-  const [images, setImages] = useState<IImage[]>(initialImages); // Use initialImages for the state
+  const [images, setImages] = useState<IImage[]>(initialImages);
   const [totalPages, setTotalPages] = useState<number>(initialTotalPages);
   const [page, setPage] = useState<number>(initialPage);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -120,7 +119,7 @@ export const Collection = ({
       ) : images.length > 0 ? (
         <ul className="collection-list">
           {images.map((image) => (
-            <Card image={image} key={String(image._id)} />
+            <Card image={image} key={image._id} />
           ))}
         </ul>
       ) : (
@@ -165,9 +164,9 @@ const Card = ({ image }: { image: IImage }) => {
         <CldImage
           src={image.publicId}
           alt={image.title}
-          width={image.width}
-          height={image.height}
-          {...image.config}
+          width={image.width || 100} // Provide a default value if width is undefined
+          height={image.height || 100} // Provide a default value if height is undefined
+          {...(image.config as any)} // Cast to any to avoid type issues with spreading
           loading="lazy"
           className="h-52 w-full rounded-[10px] object-cover"
           sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
