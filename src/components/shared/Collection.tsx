@@ -14,14 +14,13 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { transformationTypes } from "@/constants";
+import { IImage } from "@/lib/database/models/image.model";
 import { formUrlQuery } from "@/lib/utils";
 
 import { Button } from "../ui/button";
 import { Search } from "./Search";
-import { IImage } from "@/lib/database/models/image.model";
 
-
-const fetchUserImages = async (page: number): Promise<{ images: IImage[], totalPages: number }> => {
+const fetchUserImages = async (page: number) => {
   console.log(`Fetching images for page ${page}`);
   const response = await fetch(`/api/images?page=${page}`);
   if (!response.ok) {
@@ -121,7 +120,7 @@ export const Collection = ({
       ) : images.length > 0 ? (
         <ul className="collection-list">
           {images.map((image) => (
-            <Card image={image} key={image._id} />
+            <Card image={image} key={String(image._id)} />
           ))}
         </ul>
       ) : (
@@ -158,7 +157,6 @@ export const Collection = ({
     </>
   );
 };
-
 const Card = ({ image }: { image: IImage }) => {
   return (
     <li>
@@ -166,9 +164,9 @@ const Card = ({ image }: { image: IImage }) => {
         <CldImage
           src={image.publicId}
           alt={image.title}
-          width={image.width || 100} // Provide a default value if width is undefined
-          height={image.height || 100} // Provide a default value if height is undefined
-          {...(image.config as any)} // Cast to any to avoid type issues with spreading
+          width={image.width}
+          height={image.height}
+          {...image.config}
           loading="lazy"
           className="h-52 w-full rounded-[10px] object-cover"
           sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
