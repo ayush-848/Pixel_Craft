@@ -34,7 +34,7 @@ const fetchUserImages = async (page: number) => {
 
 export const Collection = ({
   hasSearch = false,
-  initialImages = [],
+  initialImages = [],  // Update to use initialImages
   totalPages: initialTotalPages = 1,
   page: initialPage = 1,
 }: {
@@ -47,7 +47,7 @@ export const Collection = ({
   const searchParams = useSearchParams();
   const { isLoaded: isUserLoaded, isSignedIn } = useUser();
 
-  const [images, setImages] = useState<IImage[]>(initialImages);
+  const [images, setImages] = useState<IImage[]>(initialImages); // Use initialImages for the state
   const [totalPages, setTotalPages] = useState<number>(initialTotalPages);
   const [page, setPage] = useState<number>(initialPage);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -157,6 +157,7 @@ export const Collection = ({
     </>
   );
 };
+
 const Card = ({ image }: { image: IImage }) => {
   return (
     <li>
