@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
+import { useUser } from "@clerk/nextjs";
 
 import {
   Pagination,
@@ -18,41 +20,104 @@ import { formUrlQuery } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Search } from "./Search";
 
+const fetchUserImages = async (page: number) => {
+  console.log(`Fetching images for page ${page}`);
+  const response = await fetch(`/api/images?page=${page}`);
+  if (!response.ok) {
+    console.error('Failed to fetch images:', response.statusText);
+    throw new Error('Failed to fetch images');
+  }
+  const data = await response.json();
+  console.log('Fetched data:', data);
+  return data;
+};
+
 export const Collection = ({
   hasSearch = false,
-  images,
-  totalPages = 1,
-  page,
+  initialImages = [],
+  totalPages: initialTotalPages = 1,
+  page: initialPage = 1,
 }: {
-  images: IImage[];
+  initialImages?: IImage[];
   totalPages?: number;
-  page: number;
+  page?: number;
   hasSearch?: boolean;
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { isLoaded: isUserLoaded, isSignedIn } = useUser();
+
+  const [images, setImages] = useState<IImage[]>(initialImages);
+  const [totalPages, setTotalPages] = useState<number>(initialTotalPages);
+  const [page, setPage] = useState<number>(initialPage);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadImages = async () => {
+    if (!isUserLoaded || !isSignedIn) {
+      console.log('User not loaded or not signed in');
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+    try {
+      console.log('Attempting to load images');
+      const data = await fetchUserImages(page);
+      console.log('Received data:', data);
+      setImages(data.images);
+      setTotalPages(data.totalPages);
+    } catch (error) {
+      console.error('Error in loadImages:', error);
+      setError('Failed to fetch images. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isUserLoaded && isSignedIn) {
+      loadImages();
+    }
+  }, [isUserLoaded, isSignedIn, page]);
 
   // PAGINATION HANDLER
   const onPageChange = (action: string) => {
     const pageValue = action === "next" ? Number(page) + 1 : Number(page) - 1;
-
     const newUrl = formUrlQuery({
       searchParams: searchParams,
       key: "page",
       value: pageValue.toString(),
     });
-
     router.push(newUrl, { scroll: false });
+    setPage(pageValue);
   };
+
+  console.log('Rendering Collection. Images:', images.length, 'Loading:', isLoading, 'Error:', error);
+
+  if (!isUserLoaded) {
+    return <div>Loading user data...</div>;
+  }
+
+  if (!isSignedIn) {
+    return <div>Please log in to view your images.</div>;
+  }
 
   return (
     <>
       <div className="collection-heading">
-        <h2 className="h2-bold text-dark-600">Recent Edits</h2>
+        <h2 className="h2-bold text-dark-600">Your Recent Edits</h2>
         {hasSearch && <Search />}
       </div>
 
-      {images.length > 0 ? (
+      {isLoading ? (
+        <div className="collection-empty">
+          <p className="p-20-semibold">Loading...</p>
+        </div>
+      ) : error ? (
+        <div className="collection-empty">
+          <p className="p-20-semibold text-red-500">{error}</p>
+        </div>
+      ) : images.length > 0 ? (
         <ul className="collection-list">
           {images.map((image) => (
             <Card image={image} key={String(image._id)} />
@@ -60,7 +125,7 @@ export const Collection = ({
         </ul>
       ) : (
         <div className="collection-empty">
-          <p className="p-20-semibold">Empty List</p>
+          <p className="p-20-semibold">No images found</p>
         </div>
       )}
 
@@ -68,7 +133,7 @@ export const Collection = ({
         <Pagination className="mt-10">
           <PaginationContent className="flex w-full">
             <Button
-              disabled={Number(page) <= 1}
+              disabled={Number(page) <= 1 || isLoading}
               className="collection-btn"
               onClick={() => onPageChange("prev")}
             >
@@ -82,7 +147,7 @@ export const Collection = ({
             <Button
               className="button w-32 bg-purple-gradient bg-cover text-white"
               onClick={() => onPageChange("next")}
-              disabled={Number(page) >= totalPages}
+              disabled={Number(page) >= totalPages || isLoading}
             >
               <PaginationNext className="hover:bg-transparent hover:text-white" />
             </Button>
@@ -92,7 +157,6 @@ export const Collection = ({
     </>
   );
 };
-
 const Card = ({ image }: { image: IImage }) => {
   return (
     <li>
@@ -114,7 +178,7 @@ const Card = ({ image }: { image: IImage }) => {
           <Image
             src={`/assets/icons/${
               transformationTypes[
-                image.transformationType as TransformationTypeKey
+                image.transformationType as keyof typeof transformationTypes
               ].icon
             }`}
             alt={image.title}
