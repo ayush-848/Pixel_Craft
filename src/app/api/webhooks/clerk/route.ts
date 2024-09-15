@@ -1,4 +1,5 @@
-/* eslint-disable camelcase */
+// File: pages/api/webhook/clerk.ts or app/api/webhook/clerk/route.ts
+
 import { clerkClient } from "@clerk/nextjs/server";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
@@ -56,6 +57,8 @@ export async function POST(req: Request) {
   // Get the ID and event type from the webhook event
   const { id } = evt.data;
   const eventType = evt.type;
+
+  console.log("Webhook received:", eventType);  // New log
 
   // Handle user creation
   if (eventType === "user.created") {

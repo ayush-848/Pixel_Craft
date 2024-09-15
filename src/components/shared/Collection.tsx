@@ -69,6 +69,9 @@ export const Collection = ({
     } catch (error) {
       console.error('Error in loadImages:', error);
       setError('Failed to fetch images. Please try again later.');
+      // Set empty state even on error
+      setImages([]);
+      setTotalPages(0);
     } finally {
       setIsLoading(false);
     }
@@ -125,7 +128,7 @@ export const Collection = ({
         </ul>
       ) : (
         <div className="collection-empty">
-          <p className="p-20-semibold">No images found</p>
+          <p className="p-20-semibold">No images found. Start by creating your first image!</p>
         </div>
       )}
 
@@ -157,6 +160,7 @@ export const Collection = ({
     </>
   );
 };
+
 const Card = ({ image }: { image: IImage }) => {
   return (
     <li>

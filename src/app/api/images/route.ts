@@ -26,7 +26,12 @@ export async function GET(req: NextRequest) {
     const user = await User.findOne({ clerkId });
     if (!user) {
       console.log('User not found in MongoDB');
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      // Return empty result instead of 404
+      return NextResponse.json({
+        images: [],
+        currentPage: page,
+        totalPages: 0
+      });
     }
 
     console.log('Found user in MongoDB:', user._id);
@@ -53,6 +58,9 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching images:', error);
-    return NextResponse.json({ message: 'Error fetching images' }, { status: 500 });
+    return NextResponse.json({ 
+      message: 'Error fetching images',
+      error: error instanceof Error ? error.message : String(error)
+    }, { status: 500 });
   }
 }

@@ -1,6 +1,9 @@
+// File: lib/actions/user.actions.ts
+
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { clerkClient } from "@clerk/nextjs/server";
 import User from "../database/models/user.model";
 import { connectToDatabase } from "../database/mongoose";
 import { handleError } from "../utils";
@@ -17,6 +20,8 @@ export async function createUser(user: CreateUserParams) {
     return JSON.parse(JSON.stringify(newUser));
   } catch (error) {
     console.error("Error creating user:", error);
+    // Log the full error object
+    console.error(JSON.stringify(error, null, 2));
     handleError(error);
   }
 }
@@ -27,11 +32,33 @@ export async function getUserById(userId: string) {
     await connectToDatabase();
     console.log("Database connected for reading user.");
 
-    const user = await User.findOne({ clerkId: userId });
+    let user = await User.findOne({ clerkId: userId });
 
     if (!user) {
       console.log("User not found for ID:", userId);
-      throw new Error("User not found");
+      
+      // Attempt to fetch user data from Clerk
+      const clerkUser = await clerkClient.users.getUser(userId);
+      
+      if (clerkUser) {
+        // Create user in your database
+        const newUser = {
+          clerkId: userId,
+          email: clerkUser.emailAddresses[0]?.emailAddress || '',
+          username: clerkUser.username || `user_${userId}`,
+          firstName: clerkUser.firstName || '',
+          lastName: clerkUser.lastName || '',
+          photo: clerkUser.imageUrl || '',
+        };
+        
+        user = await createUser(newUser);
+        console.log("User created as fallback:", user);
+      }
+    }
+
+    if (!user) {
+      console.log("User still not found after fallback creation attempt");
+      return null;
     }
 
     console.log("User found:", user);
@@ -52,7 +79,7 @@ export async function updateUser(clerkId: string, user: UpdateUserParams) {
 
     if (!updatedUser) {
       console.log("User update failed for Clerk ID:", clerkId);
-      throw new Error("User update failed");
+      return null;
     }
 
     console.log("User updated:", updatedUser);
@@ -69,17 +96,17 @@ export async function deleteUser(clerkId: string) {
     await connectToDatabase();
     console.log("Database connected for deleting user.");
 
-    const userToDelete = await User.findOne({ clerkId });
-    if (!userToDelete) {
+    const deletedUser = await User.findOneAndDelete({ clerkId });
+
+    if (!deletedUser) {
       console.log("User not found for deletion with Clerk ID:", clerkId);
-      throw new Error("User not found");
+      return null;
     }
 
-    const deletedUser = await User.findByIdAndDelete(userToDelete._id);
     console.log("User deleted:", deletedUser);
     revalidatePath("/");
 
-    return deletedUser ? JSON.parse(JSON.stringify(deletedUser)) : null;
+    return JSON.parse(JSON.stringify(deletedUser));
   } catch (error) {
     console.error("Error deleting user:", error);
     handleError(error);
@@ -100,7 +127,7 @@ export async function updateCredits(userId: string, creditFee: number) {
 
     if (!updatedUserCredits) {
       console.log("Credits update failed for User ID:", userId);
-      throw new Error("User credits update failed");
+      return null;
     }
 
     console.log("User credits updated:", updatedUserCredits);
