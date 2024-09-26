@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pixel Craft
 
-## Getting Started
+This repository contains a project called Pixel Craft, developed using TypeScript.
 
-First, run the development server:
+## Description
+
+Pixel Craft is a web application that allows users to create pixel art designs with ease. It provides a user-friendly interface for drawing and customizing pixel art graphics. Whether you are a beginner or an experienced pixel artist, Pixel Craft caters to all skill levels.
+
+## Features
+
+- User-friendly interface for drawing pixel art
+- Various color palettes and brush sizes to choose from
+- Save and export pixel art designs as PNG images
+- Undo/redo functionality for easier edits
+- Grid overlay to assist with precise drawing
+
+## Technologies Used
+
+- TypeScript
+- HTML
+- CSS
+
+## Prerequisites
+
+Before getting started, ensure that you have the following:
+- Node.js installed on your system
+- npm package manager
+
+## Installation
+
+Follow these steps to set up the Pixel Craft project on your local machine:
+
+1. Clone the repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/Pixel_Craft.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Configuration
 
-## Learn More
+No additional configuration is required for this project.
 
-To learn more about Next.js, take a look at the following resources:
+## Usage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To use Pixel Craft, open the project in a browser and start creating pixel art designs by selecting colors and drawing on the canvas.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Example code snippet for drawing a blue pixel:
 
-## Deploy on Vercel
+```typescript
+const canvas = document.getElementById('pixel-canvas');
+const ctx = canvas.getContext('2d');
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+ctx.fillStyle = 'blue';
+ctx.fillRect(x, y, pixelSize, pixelSize);
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Reference
+
+Pixel Craft does not have a specific API, as it is a standalone web application.
+
+## Testing
+
+To run the tests for Pixel Craft, use the following command:
+
+```bash
+npm test
+```
+
+## Contributing
+
+If you wish to contribute to Pixel Craft, please follow these guidelines:
+- Fork the repository
+- Create a new branch for your feature or fix
+- Make your changes and submit a pull request
+
+Please adhere to the [Code of Conduct](CODE_OF_CONDUCT.md) for a positive contribution experience.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+## Contact Information
+
+For any questions or concerns regarding Pixel Craft, please contact the maintainers at [maintainer@example.com](mailto:maintainer@example.com).
+
+## Acknowledgments
+
+- Special thanks to all contributors who have helped improve Pixel Craft.
