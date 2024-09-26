@@ -64,31 +64,4 @@ ctx.fillRect(x, y, pixelSize, pixelSize);
 
 Pixel Craft does not have a specific API, as it is a standalone web application.
 
-## Testing
 
-To run the tests for Pixel Craft, use the following command:
-
-```bash
-npm test
-```
-
-## Contributing
-
-If you wish to contribute to Pixel Craft, please follow these guidelines:
-- Fork the repository
-- Create a new branch for your feature or fix
-- Make your changes and submit a pull request
-
-Please adhere to the [Code of Conduct](CODE_OF_CONDUCT.md) for a positive contribution experience.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
-## Contact Information
-
-For any questions or concerns regarding Pixel Craft, please contact the maintainers at [maintainer@example.com](mailto:maintainer@example.com).
-
-## Acknowledgments
-
-- Special thanks to all contributors who have helped improve Pixel Craft.
